@@ -18,7 +18,7 @@ class MapController extends Controller
     {
         // 指定のMapデータ取得
         $map = Map::find($id);
-        return view('map.show', ['map' => $map]);
+        return view('map.show', compact('map'));
     }
     // DI（注入）
     public function postMap(Request $request)

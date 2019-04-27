@@ -18,3 +18,5 @@ Route::get('/', function () {
 Route::get('/','MapController@index');
 Route::get('/show/{id}','MapController@getMap');
 Route::post('/map','MapController@postMap');
+
+// Route::get('/get','MapController@get');

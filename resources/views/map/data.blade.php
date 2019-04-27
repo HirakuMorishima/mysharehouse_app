@@ -4,14 +4,17 @@
 </head>
 <body>
     <h1>Map</h1>
+    <!--マップ表示-->
+    <div id="map" style="width:550px; height:300px;"></div>
+    
     <!-- Map入力フォーム -->
     <form method="POST" action="/map"> 
     {{csrf_field()}}
      
     名称: <input type="text" name="name">
     <br>
-    緯度: <input type="text" name="lat">
-    経度: <input type="text" name="lng">
+    緯度: <input type="text" name="lat" id="show_lat">
+    経度: <input type="text" name="lng" id="show_lng">
     <br>
     説明: <input type="text" name="description"> 
     <br>
@@ -39,10 +42,6 @@
     @endforeach
     </table>
     
-    <!-- 全マーカーを表示するマップ作成　-->
-    
-    <!--マップ表示-->
-    <div id="map" style="width:550px; height:300px;"></div>
     
     <!--mapsテーブルのデータを取得-->
     <?php $list = \App\Map::all()->toArray();
@@ -58,10 +57,11 @@
     var map;
     var marker = [];
     var infoWindow = [];
+    var markersArray = [];
     // 
     var list = <?php echo $json_list ?>;
     // console.log(list[0]['lat']);
-    console.log(list[0]['description']);
+    // console.log(list[0]['description']);
     // var markerData = list;
     function initMap() {
         
@@ -90,18 +90,52 @@
              '</div>'
         });
         
-        // マーカーにクリックイベントを追加
+        // マーカーにinfoWindowがポップアップするクリックイベントを追加
         markerEvent(i);
         }
+        
+        // マーカー設置をするクリックイベントを追加
+        markerSet();
+        
+        // マーカーを中心点にして地図を移動する
+        // google.maps.e.addListener(map, "idele", function(){
+        //     mylistener(map.getCenter());
+        // });
     }
     
-    // マーカーにクリックイベントを追加
+    // マーカーをクリックした時に吹き出しを表示されるfunctionを設定
     function markerEvent(i) {
         marker[i].addListener('click', function() {
-            // マーカーをクリックした時に吹き出しを表示
             infoWindow[i].open(map, marker[i]);
         });
     }
+    
+    // mapをクリックした時のイベントを設定（マーカー設置）
+    function markerSet() {
+        google.maps.event.addListener(map, 'click', mylistener);
+    }
+    
+    // クリックした時にマーカーが設置されるfunctionを設定
+    function mylistener(e) {
+        // clearOverlaysで設置したマーカーを最新のもの以外全て削除
+        clearOverlays();
+        // marker作成
+        var marker = new google.maps.Marker({
+            position:e.latLng,
+            map:map
+        });
+        markersArray.push(marker);
+        document.getElementById("show_lat").value = e.latLng.lat();
+        document.getElementById("show_lng").value = e.latLng.lng();
+    }
+    
+    // 設置したマーカーを最新のもの以外全て削除
+    function clearOverlays() {
+        for(var i = 0; i < markersArray.length; i++ ) {
+            markersArray[i].setMap(null);
+        }
+    }
+    
     </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvn9d-e_XunRhPixNrbCx5Bz4wt28sCKE&callback=initMap"></script> 

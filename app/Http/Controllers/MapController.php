@@ -34,4 +34,5 @@ class MapController extends Controller
         $list = Map::all();
         return view('map.data', ['list' => $list]);
     }
+    
 }
